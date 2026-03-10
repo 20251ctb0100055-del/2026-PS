@@ -3,9 +3,9 @@
 # ==========================================================
 # Disciplina : Programação de Sistemas (PS)
 # Aula       : 05 - Revisão: Estruturas de Dados
-# Autor      : João
+# Autor      : João Pedro Mauda
 # Data       : 05/03/2026
-# Repositório: https://github.com/[SEU-USUARIO]/2026-PS
+# Repositório: https://github.com/20251ctb0100055-del/2026-PS
 # ==========================================================
 #
 # DESCRIÇÃO:
