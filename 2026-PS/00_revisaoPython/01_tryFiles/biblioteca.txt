@@ -1,0 +1,5 @@
+O Programador Pragmático|Andrew Hunt|False
+Código Limpo|Robert C. Martin|False
+Padrões de Projeto|Erich Gamma|True
+Homem Aranha|joaomauda|True
+Homem Aranha 2|joaomauda|True
