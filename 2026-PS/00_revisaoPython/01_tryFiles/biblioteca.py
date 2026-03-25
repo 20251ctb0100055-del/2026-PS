@@ -1,3 +1,12 @@
+# ====================================================
+# SISTEMA DE APROVAÇÃO DE ALUNOS 
+# ====================================================
+# Disciplina : Programação de Sistemas (PS)
+# Aula       : 10 - Atividade: Atividade: Sistema de Biblioteca
+# Autor      : JOÃO PEDRO MAUDA
+# Data       : 24/03/2026
+# Repositório: https://github.com/20251ctb0100055-del/2026-PS
+# ====================================================
 ARQUIVO = "biblioteca.txt"
 SEPARADOR = "|"
 
