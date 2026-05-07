@@ -9,11 +9,11 @@
 =======================================================
 '''
 
-# DEFINIÇÃO DA CLASSE: O molde que agrupa os dados e comportamentos dos pets.
+#O molde que junta os dados e comportamentos dos pets.
 class Pet:
 
 
-    # MÉTODO CONSTRUTOR: Define os atributos iniciais do objeto.
+    # método construtor define os atributos iniciais do objeto.
     def __init__(self, nome, especie, idade, raca, peso, nome_dono, vacinado=False):    
 
         self.nome = nome
@@ -25,7 +25,7 @@ class Pet:
         self.vacinado = vacinado
         self.hospedado = False # Inicializa como não hospedado
 
-    # MÉTODO DE EXIBIÇÃO: Mostra na tela as informações detalhadas do pet.
+    
     def exibir_dados(self):
   
         print("\n--- Dados do Pet ---")
@@ -36,7 +36,7 @@ class Pet:
         print(f"Dono: {self.nome_dono}")
         print(f"Hospedado: {'Sim' if self.hospedado else 'Não'}")
 
-    # MÉTODO DE ENTRADA: Registra o pet no hotel com validação de status.
+   # Registra o pet no hotel com validação de status.
     def registrar_entrada(self):
 
         if self.hospedado:
@@ -45,7 +45,7 @@ class Pet:
             self.hospedado = True
             print(f"{self.nome} entrou no hotel com sucesso.")
 
-    # MÉTODO DE SAÍDA: Registra a saída do pet com validação de status.
+    # Registra a saída do pet com validação de status.
     def registrar_saida(self):
     
         if not self.hospedado:
@@ -54,7 +54,7 @@ class Pet:
             self.hospedado = False
             print(f"{self.nome} saiu do hotel.")
 
-    # MÉTODO DE CÁLCULO: Define o preço da diária baseando-se na idade.
+    # Define o preço da diária baseando-se na idade.
     def calcular_diaria(self):
    
         if self.idade <= 3:
@@ -64,7 +64,7 @@ class Pet:
         else:
             return 75.00
 
-    # MÉTODO DE VACINAÇÃO: Informa se a saúde do pet está em dia.
+    # Informa se a saúde do pet está em dia.
     def verificar_vacinacao(self):
 
         if self.vacinado:
@@ -72,13 +72,13 @@ class Pet:
         else:
             print(f"Atenção: vacinação de {self.nome} pendente.")
 
-    # MÉTODO DE ATUALIZAÇÃO: Altera o atributo de peso do objeto.
+    # Altera o atributo de peso do objeto.
     def atualizar_peso(self, novo_peso):
 
         self.peso = novo_peso
         print(f"Peso de {self.nome} atualizado para {self.peso}kg.")
 
-    # MÉTODO DE RESUMO: Gera um relatório completo consolidando dados e métodos.
+    # Gera um relatório completo consolidando dados e métodos.
     def emitir_resumo(self):
 
         diaria = self.calcular_diaria()
