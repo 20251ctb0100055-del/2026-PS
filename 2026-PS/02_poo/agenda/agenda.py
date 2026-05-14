@@ -1,11 +1,11 @@
 #####################################################################
 # Disciplina : Programação de Sistemas                              #
 # Aula       : 23 – Menu interativo e persistência de objetos       #
-# Tipo       : Gabarito (Mão na Massa)                             #
-# Autor      : Profe. Berssa                                        #
-# Data       : 2026                                                 #
+# Tipo       : Gabarito
+# Autor      : João Pedro Mauda                                        #
+# Data       : 14/05/2026                                                 #
 # Descrição  : Agenda de Contatos com menu, CRUD em memória         #
-#              e dois formatos de persistência (.txt e binário).    #
+#              e dois formatos de persistência
 #              Serve de modelo para o Sistema de Hotel para Pets V2.0.#
 #####################################################################
 
