@@ -1,0 +1,24 @@
+[
+    {
+        "nome": "Chico",
+        "especie": "Lhasa",
+        "idade": 1,
+        "peso": 3.0,
+        "nome_dono": "joao",
+        "vacinado": true,
+        "data_nascimento": "12/08/2026",
+        "altura": 20.0,
+        "hospedado": false
+    },
+    {
+        "nome": "Tavios",
+        "especie": "Azulao",
+        "idade": 12,
+        "peso": 57.0,
+        "nome_dono": "Buia",
+        "vacinado": false,
+        "data_nascimento": "12/10/2010",
+        "altura": 160.0,
+        "hospedado": false
+    }
+]
