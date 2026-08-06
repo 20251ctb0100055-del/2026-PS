@@ -57,7 +57,7 @@ def salvar_em_txt(contatos, caminho):
     # encoding="utf-8" garante que acentos funcionem corretamente.
     with open(caminho, "w", encoding="utf-8") as arquivo:
         for c in contatos:
-            # Cada objeto sabe se converter em linha (método da classe).
+            # Cada objeto se converte em linha(codigo)
             arquivo.write(c.para_linha_txt() + "\n")
     print(f"√ {len(contatos)} contato(s) salvo(s) em {caminho}")
 
