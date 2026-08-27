@@ -10,13 +10,13 @@ public class Aluno {
     private String matricula;
     private String nome;
     private String curso;
-    private int idade;
+    private String cidade;
 
-    public Aluno(String matricula, String nome, String curso, int idade) {
+    public Aluno(String matricula, String nome, String curso, String cidade) {
         this.matricula = matricula;
         this.nome = nome;
         this.curso = curso;
-        this.idade = idade;
+        this.cidade = cidade;
     }
 
     public String getMatricula() {
@@ -43,17 +43,16 @@ public class Aluno {
         this.curso = curso;
     }
 
-    public int getIdade() {
-        return idade;
+    public String getCidade() {
+        return cidade;
     }
 
-    public void setIdade(int idade) {
-        this.idade = idade;
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
     }
 
-    // A receita de apresentação da ficha
     @Override
     public String toString() {
-        return matricula + " | " + nome + " | " + curso + " | " + idade + " anos";
+        return matricula + " | " + nome + " | " + curso + " | " + cidade;
     }
 }

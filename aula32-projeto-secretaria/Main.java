@@ -90,16 +90,14 @@ public class Main {
             return;
         }
 
-        System.out.print("Idade: ");
-        String idadeStr = teclado.nextLine().trim();
-        int idade = 0;
-        try {
-            idade = Integer.parseInt(idadeStr);
-        } catch (Exception e) {
-            System.out.println("Idade invalida. Definida como 0.");
+        System.out.print("Cidade: ");
+        String cidade = teclado.nextLine().trim();
+        if (cidade.isEmpty()) {
+            System.out.println("Erro: A cidade nao pode ser vazia!");
+            return;
         }
 
-        Aluno novo = new Aluno(matricula, nome, curso, idade);
+        Aluno novo = new Aluno(matricula, nome, curso, cidade);
         lista.add(novo);
         System.out.println("Ficha de " + nome + " arquivada!");
     }
@@ -110,7 +108,6 @@ public class Main {
         } else {
             System.out.println("--- FICHAS NO GAVETEIRO: " + lista.size() + " ---");
             for (Aluno a : lista) {
-                // A impressao chama o toString sozinha
                 System.out.println(a);
             }
         }
@@ -170,17 +167,14 @@ public class Main {
         System.out.print("Contar alunos de qual curso? ");
         String cursoProcurado = teclado.nextLine().trim();
 
-        // preparar (ANTES do for)
         int contador = 0;
 
-        // percorrer
         for (Aluno a : lista) {
             if (a.getCurso().equalsIgnoreCase(cursoProcurado)) {
                 contador++;
             }
         }
 
-        // usar
         System.out.println("Alunos de " + cursoProcurado + ": " + contador);
     }
 }
