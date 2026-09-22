@@ -1,6 +1,6 @@
 # 5. 🎯 Autoavaliação conceitual
 
-**Link do repositório:** https://github.com/20251ctb0100055-del/2026-PS/tree/66d2ead2f73ae372435aa4d117bb1ebb5e8c1ba7/aula32-projeto-secretaria
+**Link do repositório:** https://github.com/20251ctb0100055-del/2026-PS/tree/8d568b573a5cfefba320604e6bb864afc45b080d/aula32-projeto-secretaria
 
 **Conceito pretendido:** A
 
