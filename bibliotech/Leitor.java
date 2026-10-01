@@ -7,12 +7,11 @@
  */
 public class Leitor extends Usuario {
 
-    // So o que a caixa Leitor acrescenta. Nome e matricula ja vem de Usuario.
     private int limiteEmprestimos;
-    private int livrosEmMaos;  // nao estava na caixa: o codigo pediu
+    private int livrosEmMaos;
 
     public Leitor(String nome, String matricula, int limiteEmprestimos) {
-        super(nome, matricula);     // primeiro a parte de Usuario, depois a de leitor
+        super(nome, matricula);
         this.limiteEmprestimos = limiteEmprestimos;
         this.livrosEmMaos = 0;
     }
@@ -25,12 +24,16 @@ public class Leitor extends Usuario {
         return livrosEmMaos;
     }
 
-    // OPERACAO DA CAIXA: podePegarEmprestimo().
-    public boolean podePegarEmprestimo() {
+    // OPERACAO DA CAIXA: podePegarEmprestado()
+    public boolean podePegarEmprestado() {
         return livrosEmMaos < limiteEmprestimos;
     }
 
-    // Os dois metodos que o emprestimo vai usar na Aula 38.
+    // Mantido para compatibilidade caso Main.java chame este nome
+    public boolean podePegarEmprestimo() {
+        return podePegarEmprestado();
+    }
+
     public void pegouLivro() {
         this.livrosEmMaos = this.livrosEmMaos + 1;
     }
