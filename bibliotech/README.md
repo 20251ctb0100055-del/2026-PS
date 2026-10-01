@@ -46,3 +46,7 @@ Hoje, a Dona Marli controla os empréstimos na ponta do lápis, o que gera atras
 ### Classes
 
 ![Diagrama de classes do BiblioTech](docs/classes.svg)
+## 5. O que o codigo devolveu ao diagrama (Aula 37)
+
+- Livro ganhou o atributo disponivel: boolean, porque estaDisponivel() precisa guardar o estado.
+- Leitor ganhou livrosEmMaos: int, porque podePegarEmprestado() compara com o limite.
