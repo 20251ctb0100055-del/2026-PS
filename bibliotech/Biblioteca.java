@@ -82,4 +82,17 @@ public class Biblioteca {
             System.out.println(emprestimos.get(i));
         }
     }
+
+    // Fornece uma descricao do acervo para a interface (Fase 2).
+    public String obterAcervoComoTexto() {
+        if (livros.isEmpty()) {
+            return "Nenhum livro cadastrado.";
+        }
+
+        String texto = "";
+        for (int i = 0; i < livros.size(); i++) {
+            texto = texto + livros.get(i) + "\n";
+        }
+        return texto;
+    }
 }
