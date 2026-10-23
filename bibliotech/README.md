@@ -81,3 +81,28 @@ java TelaBiblioteca
 - RNF02: qualquer pessoa que abre a janela pode emprestar e devolver; nao ha login de bibliotecario.
 - Cadastrar livro e leitor pela janela: hoje o cadastro esta no `main` de `TelaBiblioteca`.
 - Guardar os dados: ao fechar o programa, os emprestimos se perdem.
+
+## Persistência de Dados com MariaDB
+
+- **Banco de dados utilizado:** MariaDB / MySQL.
+- **Classe Conexao:** Responsável por gerenciar a conexão JDBC com o banco `bibliotech` usando variáveis de ambiente.
+- **Classe LivroDAO:** Responsável pelas operações CRUD na tabela `livros` usando `PreparedStatement`.
+- **Métodos Implementados:**
+  - `adicionarLivro()`: Insere um novo registro no banco.
+  - `atualizarLivro()`: Atualiza dados de um livro existente através do seu ID.
+  - `excluirLivro()`: Remove um livro do banco através do seu ID.
+
+### Configuração de Variáveis de Ambiente
+Antes de rodar a aplicação, defina no terminal:
+```bash
+export DB_USER=bibliotech
+export DB_PASSWORD=123456
+
+## Como Executar os Testes
+Para compilar e executar o teste com o driver JDBC do MariaDB:
+
+```bash
+javac -cp ".:lib/*" Conexao.java LivroDAO.java TesteLivroDAO.java
+java -cp ".:lib/*" TesteLivroDAO
+
+## Como eu fiz o trabalho localmente, nao consegui testa-lo, por isso esta se os print's
