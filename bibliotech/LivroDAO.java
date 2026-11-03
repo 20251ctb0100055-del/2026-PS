@@ -1,3 +1,9 @@
+/*
+ * Disciplina: 2026-PS
+ * Projeto   : bibliotech
+ * Arquivo   : LivroDAO.java
+ * Descricao : DAO adaptado para a Parte 15 para retornar objetos da classe Livro.
+ */
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,10 +66,10 @@ public class LivroDAO {
         }
     }
 
-    // Método de listagem da Aula 43 (com a ordenação por ano decrescente do desafio)
-    public List<String> listarLivros() {
-        List<String> livros = new ArrayList<>();
-        String sql = "SELECT id, titulo, autor, ano FROM livros ORDER BY ano DESC";
+    // Parte 15: listarLivros() retornando List<Livro>
+    public List<Livro> listarLivros() {
+        List<Livro> livros = new ArrayList<>();
+        String sql = "SELECT id, titulo, autor, ano FROM livros ORDER BY titulo";
 
         try (Connection conexao = Conexao.conectar();
              PreparedStatement comando = conexao.prepareStatement(sql);
@@ -75,7 +81,8 @@ public class LivroDAO {
                 String autor = resultado.getString("autor");
                 int ano = resultado.getInt("ano");
 
-                String livro = id + " - " + titulo + " - " + autor + " (" + ano + ")";
+                // Instancia o objeto Livro com os dados vindo do MariaDB
+                Livro livro = new Livro(id, titulo, autor, ano);
                 livros.add(livro);
             }
 
@@ -85,8 +92,9 @@ public class LivroDAO {
 
         return livros;
     }
-    // Método adicionado na Aula 43 - Parte 14
-    public String buscarLivroPorId(int id) {
+
+    // Parte 15: buscarLivroPorId() retornando um objeto Livro
+    public Livro buscarLivroPorId(int id) {
         String sql = "SELECT id, titulo, autor, ano FROM livros WHERE id = ?";
 
         try (Connection conexao = Conexao.conectar();
@@ -101,7 +109,8 @@ public class LivroDAO {
                     String autor = resultado.getString("autor");
                     int ano = resultado.getInt("ano");
 
-                    return codigo + " - " + titulo + " - " + autor + " (" + ano + ")";
+                    // Retorna o objeto Livro construído a partir do banco
+                    return new Livro(codigo, titulo, autor, ano);
                 }
             }
 

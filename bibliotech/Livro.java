@@ -3,16 +3,26 @@
  * Projeto   : bibliotech
  * Arquivo   : Livro.java
  * Autor     : João Pedro Mauda
- * Descricao : a caixa "Livro" do diagrama de classes, em Java (Aula37).
+ * Descricao : Classe de modelo do Livro atualizada para a Parte 15 com 'id'.
  */
 public class Livro {
-    // ATRIBUTOS: a faixa do meio da caixa, um por linha, todos private.
+    // ATRIBUTOS
+    private int id; // Atributo necessário para representar o ID do MariaDB
     private String titulo;
     private String autor;
     private int ano;
-    private boolean disponivel; // nao estava na caixa: o codigo pediu
+    private boolean disponivel;
 
-    // CONSTRUTOR: preenche a ficha do livro no momento do "new".
+    // CONSTRUTOR COMPLETO: para quando os dados vêm do MariaDB (com ID)
+    public Livro(int id, String titulo, String autor, int ano) {
+        this.id = id;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.ano = ano;
+        this.disponivel = true;
+    }
+
+    // CONSTRUTOR SEM ID: para quando criamos o objeto antes de salvar no banco
     public Livro(String titulo, String autor, int ano) {
         this.titulo = titulo;
         this.autor = autor;
@@ -20,25 +30,44 @@ public class Livro {
         this.disponivel = true;
     }
 
-    // GETTERS: as janelas de leitura.
+    // GETTERS E SETTERS
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitulo() {
         return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getAutor() {
         return autor;
     }
 
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
     public int getAno() {
         return ano;
     }
 
-    // OPERAÇÃO DA CAIXA: estaDisponivel(), a faixa de baixo do diagrama
+    public void setAno(int ano) {
+        this.ano = ano;
+    }
+
+    // OPERAÇÕES DE ESTADO
     public boolean estaDisponivel() {
         return disponivel;
     }
 
-    // OPERAÇÕES QUE MUDAM O ESTADO (Fase 4.3)
     public void emprestar() {
         this.disponivel = false;
     }
@@ -47,9 +76,10 @@ public class Livro {
         this.disponivel = true;
     }
 
-    // REPRESENTAÇÃO EM TEXTO (Fase 4.3)
+    // REPRESENTAÇÃO EM TEXTO
+    @Override
     public String toString() {
         String situacao = disponivel ? "disponivel" : "emprestado";
-        return titulo + " (" + autor + ", " + ano + ") - " + situacao;
+        return id + " - " + titulo + " (" + autor + ", " + ano + ") - " + situacao;
     }
 }

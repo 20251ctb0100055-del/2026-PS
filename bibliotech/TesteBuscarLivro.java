@@ -2,7 +2,7 @@
  * Disciplina: 2026-PS
  * Projeto   : bibliotech
  * Arquivo   : TesteBuscarLivro.java
- * Descricao : Classe de teste para busca interativa de livros por ID no MariaDB.
+ * Descricao : Classe de teste atualizada para a Parte 15 (busca por ID com objeto Livro).
  */
 import java.util.Scanner;
 
@@ -27,12 +27,21 @@ public class TesteBuscarLivro {
                 break;
             }
 
-            String livro = dao.buscarLivroPorId(id);
+            // Agora o retorno do método é um objeto da classe Livro
+            Livro livro = dao.buscarLivroPorId(id);
 
             if (livro != null) {
+
                 System.out.println("Livro encontrado:");
-                System.out.println(livro);
+                System.out.println(
+                    livro.getId() + " - " +
+                    livro.getTitulo() + " - " +
+                    livro.getAutor() + " (" +
+                    livro.getAno() + ")"
+                );
+
             } else {
+
                 System.out.println("Livro não encontrado.");
             }
         }
