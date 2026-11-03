@@ -1,3 +1,9 @@
+/*
+ * Disciplina: 2026-PS
+ * Projeto   : bibliotech
+ * Arquivo   : TesteListarLivros.java
+ * Descricao : Classe para testar a listagem de livros vindo do MariaDB.
+ */
 import java.util.List;
 
 public class TesteListarLivros {
@@ -8,18 +14,11 @@ public class TesteListarLivros {
 
         List<String> livros = dao.listarLivros();
 
-        System.out.println(
-            "=== LIVROS CADASTRADOS ==="
-        );
+        System.out.println("=== LIVROS CADASTRADOS ===");
 
         if (livros.isEmpty()) {
-
-            System.out.println(
-                "Nenhum livro encontrado."
-            );
-
+            System.out.println("Nenhum livro encontrado.");
         } else {
-
             for (String livro : livros) {
                 System.out.println(livro);
             }

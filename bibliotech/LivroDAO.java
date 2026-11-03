@@ -60,7 +60,7 @@ public class LivroDAO {
         }
     }
 
-    // Método adicionado para a Aula 43 (com a ordenação por ano do desafio)
+    // Método de listagem da Aula 43 (com a ordenação por ano decrescente do desafio)
     public List<String> listarLivros() {
         List<String> livros = new ArrayList<>();
         String sql = "SELECT id, titulo, autor, ano FROM livros ORDER BY ano DESC";
