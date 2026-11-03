@@ -1,6 +1,9 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LivroDAO {
 
@@ -55,5 +58,31 @@ public class LivroDAO {
             System.out.println("Erro ao excluir: " + e.getMessage());
             return false;
         }
+    }
+
+    // Método adicionado para a Aula 43 (com a ordenação por ano do desafio)
+    public List<String> listarLivros() {
+        List<String> livros = new ArrayList<>();
+        String sql = "SELECT id, titulo, autor, ano FROM livros ORDER BY ano DESC";
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement comando = conexao.prepareStatement(sql);
+             ResultSet resultado = comando.executeQuery()) {
+
+            while (resultado.next()) {
+                int id = resultado.getInt("id");
+                String titulo = resultado.getString("titulo");
+                String autor = resultado.getString("autor");
+                int ano = resultado.getInt("ano");
+
+                String livro = id + " - " + titulo + " - " + autor + " (" + ano + ")";
+                livros.add(livro);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar livros: " + e.getMessage());
+        }
+
+        return livros;
     }
 }
