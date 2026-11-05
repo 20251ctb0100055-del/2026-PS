@@ -2,7 +2,7 @@
  * Disciplina: 2026-PS
  * Projeto   : bibliotech
  * Arquivo   : LivroDAO.java
- * Descricao : DAO adaptado para a Parte 15 para retornar objetos da classe Livro.
+ * Descricao : DAO adaptado para a Aula 44 com suporte a busca por titulo (LIKE).
  */
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -119,5 +119,39 @@ public class LivroDAO {
         }
 
         return null;
+    }
+
+    // Parte 18 (Aula 44): buscarLivrosPorTitulo() utilizando o operador LIKE
+    public List<Livro> buscarLivrosPorTitulo(String titulo) {
+        List<Livro> livros = new ArrayList<>();
+
+        String sql = "SELECT id, titulo, autor, ano " +
+                     "FROM livros " +
+                     "WHERE titulo LIKE ? " +
+                     "ORDER BY titulo";
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement comando = conexao.prepareStatement(sql)) {
+
+            // Adiciona os wildcards % para pesquisar por partes do título
+            comando.setString(1, "%" + titulo + "%");
+
+            try (ResultSet resultado = comando.executeQuery()) {
+                while (resultado.next()) {
+                    Livro livro = new Livro(
+                        resultado.getInt("id"),
+                        resultado.getString("titulo"),
+                        resultado.getString("autor"),
+                        resultado.getInt("ano")
+                    );
+                    livros.add(livro);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar livros por título: " + e.getMessage());
+        }
+
+        return livros;
     }
 }
