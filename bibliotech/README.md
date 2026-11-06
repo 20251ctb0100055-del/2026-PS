@@ -96,7 +96,7 @@ java TelaBiblioteca
 Antes de rodar a aplicação, defina no terminal:
 ```bash
 export DB_USER=bibliotech
-export DB_PASSWORD=123456
+export DB_PASSWORD=SUA_SENHA_FORTE
 
 ## Como Executar os Testes
 Para compilar e executar o teste com o driver JDBC do MariaDB:

@@ -1,3 +1,9 @@
+/*
+ * Disciplina: 2026-PS
+ * Projeto   : bibliotech
+ * Arquivo   : TelaLivros.java
+ * Descricao : Interface Grafica Swing integrada ao MariaDB (JTable, Busca por ID e Titulo).
+ */
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -10,98 +16,78 @@ public class TelaLivros extends JFrame {
     private final DefaultTableModel modelo;
     private final JTable tabela;
 
-    private final JTextField campoId =
-        new JTextField(8);
-
-    private final JLabel status =
-        new JLabel("Pronto.");
+    private final JTextField campoId = new JTextField(5);
+    private final JTextField campoTitulo = new JTextField(12);
+    private final JLabel status = new JLabel("Pronto.");
 
     public TelaLivros() {
 
-        setTitle("BiblioTech - Consulta de Livros");
-        setSize(850, 450);
+        setTitle("BiblioTech - Consulta e Busca de Livros");
+        setSize(900, 500);
         setLocationRelativeTo(null);
-
-        setDefaultCloseOperation(
-            JFrame.DISPOSE_ON_CLOSE
-        );
-
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(8, 8));
 
         modelo = new DefaultTableModel(
-            new Object[]{
-                "ID", "Título", "Autor", "Ano"
-            }, 0
+            new Object[]{"ID", "Título", "Autor", "Ano"}, 0
         ) {
             @Override
-            public boolean isCellEditable(
-                int linha, int coluna) {
+            public boolean isCellEditable(int linha, int coluna) {
                 return false;
             }
         };
 
         tabela = new JTable(modelo);
+        add(new JScrollPane(tabela), BorderLayout.CENTER);
 
-        add(
-            new JScrollPane(tabela),
-            BorderLayout.CENTER
-        );
+        JPanel controles = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JPanel controles = new JPanel(
-            new FlowLayout(FlowLayout.LEFT)
-        );
+        JButton atualizar = new JButton("Atualizar listagem");
+        JButton buscarId = new JButton("Buscar por ID");
+        JButton buscarTitulo = new JButton("Buscar por título");
+        JButton mostrarTodos = new JButton("Mostrar todos");
 
-        JButton atualizar =
-            new JButton("Atualizar listagem");
-
-        JButton buscar =
-            new JButton("Buscar por ID");
-
-        JButton mostrarTodos =
-            new JButton("Mostrar todos");
-
-        controles.add(new JLabel("ID do livro:"));
+        controles.add(new JLabel("ID:"));
         controles.add(campoId);
-        controles.add(buscar);
+        controles.add(buscarId);
+        controles.add(new JLabel(" Título:"));
+        controles.add(campoTitulo);
+        controles.add(buscarTitulo);
         controles.add(atualizar);
         controles.add(mostrarTodos);
 
         add(controles, BorderLayout.NORTH);
         add(status, BorderLayout.SOUTH);
 
-        atualizar.addActionListener(
-            e -> carregarLivros()
-        );
+        // Acoes dos botoes e atalhos Enter
+        atualizar.addActionListener(e -> carregarLivros());
+        mostrarTodos.addActionListener(e -> {
+            campoId.setText("");
+            campoTitulo.setText("");
+            carregarLivros();
+        });
 
-        mostrarTodos.addActionListener(
-            e -> carregarLivros()
-        );
+        buscarId.addActionListener(e -> buscarLivroPorId());
+        campoId.addActionListener(e -> buscarLivroPorId());
 
-        buscar.addActionListener(
-            e -> buscarLivro()
-        );
+        buscarTitulo.addActionListener(e -> buscarPorTitulo());
+        campoTitulo.addActionListener(e -> buscarPorTitulo());
 
         carregarLivros();
     }
 
     private void carregarLivros() {
-
         modelo.setRowCount(0);
-
-        List<Livro> livros =
-            dao.listarLivros();
+        List<Livro> livros = dao.listarLivros();
 
         for (Livro livro : livros) {
             adicionarLinha(livro);
         }
 
-        status.setText(
-            "Livros apresentados: " + livros.size()
-        );
+        status.setText("Livros apresentados: " + livros.size());
     }
 
     private void adicionarLinha(Livro livro) {
-
         modelo.addRow(new Object[]{
             livro.getId(),
             livro.getTitulo(),
@@ -110,58 +96,53 @@ public class TelaLivros extends JFrame {
         });
     }
 
-    private void buscarLivro() {
-
+    private void buscarLivroPorId() {
         String texto = campoId.getText().trim();
-
         int id;
 
         try {
             id = Integer.parseInt(texto);
-
-            if (id <= 0) {
-                throw new NumberFormatException();
-            }
-
+            if (id <= 0) throw new NumberFormatException();
         } catch (NumberFormatException ex) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "Informe um ID inteiro positivo.",
-                "Entrada inválida",
-                JOptionPane.WARNING_MESSAGE
-            );
-
+            JOptionPane.showMessageDialog(this, "Informe um ID inteiro positivo.", "Entrada inválida", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         Livro livro = dao.buscarLivroPorId(id);
-
         modelo.setRowCount(0);
 
         if (livro == null) {
-
-            status.setText(
-                "Nenhum livro encontrado para o ID " + id
-            );
-
-            JOptionPane.showMessageDialog(
-                this,
-                "Livro não encontrado."
-            );
-
+            status.setText("Nenhum livro encontrado para o ID " + id);
+            JOptionPane.showMessageDialog(this, "Livro não encontrado.");
         } else {
-
             adicionarLinha(livro);
+            status.setText("Livro encontrado: " + livro.getTitulo());
+        }
+    }
 
-            status.setText(
-                "Livro encontrado: " + livro.getTitulo()
-            );
+    private void buscarPorTitulo() {
+        String titulo = campoTitulo.getText().trim();
+
+        if (titulo.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Informe o título do livro.", "Campo obrigatório", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        List<Livro> livros = dao.buscarLivrosPorTitulo(titulo);
+        modelo.setRowCount(0);
+
+        for (Livro livro : livros) {
+            adicionarLinha(livro);
+        }
+
+        status.setText("Livros encontrados: " + livros.size());
+
+        if (livros.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nenhum livro encontrado.");
         }
     }
 
     public static void main(String[] args) {
-
         SwingUtilities.invokeLater(() -> {
             new TelaLivros().setVisible(true);
         });
