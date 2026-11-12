@@ -3,112 +3,192 @@
  * Projeto   : bibliotech
  * Arquivo   : TelaLivros.java
  * Autor     : João Pedro Mauda
- * Descricao : Interface do Catálogo BiblioTech com capas estilizadas em código e suporte a imagens personalizadas.
+ * Descricao : Interface moderna do Catálogo BiblioTech com design aprimorado, hover nos cards e busca por Título/ID.
  */
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.util.Collections;
 import java.util.List;
 
 public class TelaLivros extends JFrame {
 
     private final LivroDAO dao = new LivroDAO();
     private final JPanel painelListaCards = new JPanel();
-    private final JTextField txtPesquisa = new JTextField(18);
+    private final JTextField txtPesquisa = new JTextField(16);
+    private final JTextField txtBuscaId = new JTextField(4);
+
+    // Paleta de Cores Moderna
+    private static final Color COR_FUNDO = new Color(241, 245, 249);
+    private static final Color COR_HEADER = new Color(30, 41, 59);
+    private static final Color COR_PRIMARIA = new Color(37, 99, 235);
+    private static final Color COR_PRIMARIA_HOVER = new Color(29, 78, 216);
+    private static final Color COR_SECUNDARIA = new Color(71, 85, 105);
+    private static final Color COR_CARD = Color.WHITE;
+    private static final Color COR_CARD_HOVER = new Color(248, 250, 252);
+    private static final Color COR_BORDA = new Color(226, 232, 240);
 
     public TelaLivros() {
         setTitle("Catálogo BiblioTech");
-        setSize(700, 650);
+        setSize(780, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Painel Principal com fundo claro
-        JPanel painelPrincipal = new JPanel(new BorderLayout(15, 15));
-        painelPrincipal.setBackground(new Color(245, 247, 250));
-        painelPrincipal.setBorder(new EmptyBorder(20, 20, 20, 20));
+        JPanel painelPrincipal = new JPanel(new BorderLayout(0, 15));
+        painelPrincipal.setBackground(COR_FUNDO);
 
-        // --- CABEÇALHO ---
-        JPanel painelTopo = new JPanel();
-        painelTopo.setLayout(new BoxLayout(painelTopo, BoxLayout.Y_AXIS));
-        painelTopo.setOpaque(false);
+        // --- BANNER SUPERIOR ESTILIZADO ---
+        JPanel bannerHeader = new JPanel(new BorderLayout());
+        bannerHeader.setBackground(COR_HEADER);
+        bannerHeader.setBorder(new EmptyBorder(22, 28, 22, 28));
+
+        JPanel textosHeader = new JPanel();
+        textosHeader.setLayout(new BoxLayout(textosHeader, BoxLayout.Y_AXIS));
+        textosHeader.setOpaque(false);
 
         JLabel lblTitulo = new JLabel("📖 Catálogo BiblioTech");
-        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 22));
-        lblTitulo.setForeground(new Color(30, 41, 59));
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 24));
+        lblTitulo.setForeground(Color.WHITE);
 
-        JLabel lblSubtitulo = new JLabel("Explore os livros disponíveis na biblioteca");
+        JLabel lblSubtitulo = new JLabel("Acervo digital • Pesquise por título, filtre por ID ou atualize capas");
         lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        lblSubtitulo.setForeground(new Color(100, 116, 139));
+        lblSubtitulo.setForeground(new Color(148, 163, 184));
 
-        painelTopo.add(lblTitulo);
-        painelTopo.add(Box.createVerticalStrut(4));
-        painelTopo.add(lblSubtitulo);
-        painelTopo.add(Box.createVerticalStrut(15));
+        textosHeader.add(lblTitulo);
+        textosHeader.add(Box.createVerticalStrut(5));
+        textosHeader.add(lblSubtitulo);
+        bannerHeader.add(textosHeader, BorderLayout.WEST);
 
-        // --- BARRA DE PESQUISA ---
+        painelPrincipal.add(bannerHeader, BorderLayout.NORTH);
+
+        // --- ÁREA DE CONTEÚDO ---
+        JPanel painelConteudo = new JPanel(new BorderLayout(0, 15));
+        painelConteudo.setOpaque(false);
+        painelConteudo.setBorder(new EmptyBorder(0, 24, 20, 24));
+
+        // --- BARRA DE PESQUISA MODERNA ---
         JPanel painelBusca = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        painelBusca.setBackground(new Color(235, 240, 248));
+        painelBusca.setBackground(Color.WHITE);
         painelBusca.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-            new EmptyBorder(5, 5, 5, 5)
+            BorderFactory.createLineBorder(COR_BORDA, 1, true),
+            new EmptyBorder(6, 12, 6, 12)
         ));
 
         JLabel lblIconeBusca = new JLabel("🔎");
-        txtPesquisa.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        txtPesquisa.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-            new EmptyBorder(6, 8, 6, 8)
-        ));
+        lblIconeBusca.setFont(new Font("SansSerif", Font.PLAIN, 15));
 
-        JButton btnPesquisar = new JButton("Pesquisar");
-        btnPesquisar.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btnPesquisar.setBackground(new Color(59, 89, 152));
-        btnPesquisar.setForeground(Color.WHITE);
-        btnPesquisar.setFocusPainted(false);
-        btnPesquisar.setBorder(new EmptyBorder(8, 16, 8, 16));
+        estilizarCampoTexto(txtPesquisa, "Digite o título do livro...");
+        JButton btnPesquisar = criarBotaoEstilizado("Pesquisar", COR_PRIMARIA, COR_PRIMARIA_HOVER);
+
+        JSeparator separador = new JSeparator(SwingConstants.VERTICAL);
+        separador.setPreferredSize(new Dimension(2, 26));
+        separador.setForeground(COR_BORDA);
+
+        JLabel lblId = new JLabel("ID:");
+        lblId.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblId.setForeground(COR_SECUNDARIA);
+
+        estilizarCampoTexto(txtBuscaId, "Nº");
+        JButton btnBuscarId = criarBotaoEstilizado("Buscar ID", COR_SECUNDARIA, new Color(51, 65, 85));
+
+        JButton btnLimpar = criarBotaoEstilizado("Todos", new Color(226, 232, 240), new Color(203, 213, 225));
+        btnLimpar.setForeground(COR_HEADER);
 
         painelBusca.add(lblIconeBusca);
         painelBusca.add(txtPesquisa);
         painelBusca.add(btnPesquisar);
+        painelBusca.add(Box.createHorizontalStrut(4));
+        painelBusca.add(separador);
+        painelBusca.add(Box.createHorizontalStrut(4));
+        painelBusca.add(lblId);
+        painelBusca.add(txtBuscaId);
+        painelBusca.add(btnBuscarId);
+        painelBusca.add(btnLimpar);
 
-        painelTopo.add(painelBusca);
-        painelPrincipal.add(painelTopo, BorderLayout.NORTH);
+        painelConteudo.add(painelBusca, BorderLayout.NORTH);
 
-        // --- LISTA DE CARDS (CENTRO COM SCROLL) ---
+        // --- LISTA DE CARDS COM SCROLL ---
         painelListaCards.setLayout(new BoxLayout(painelListaCards, BoxLayout.Y_AXIS));
-        painelListaCards.setBackground(new Color(245, 247, 250));
+        painelListaCards.setBackground(COR_FUNDO);
 
         JScrollPane scrollPane = new JScrollPane(painelListaCards);
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(12);
-        painelPrincipal.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.getViewport().setBackground(COR_FUNDO);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(14);
+        painelConteudo.add(scrollPane, BorderLayout.CENTER);
+
+        painelPrincipal.add(painelConteudo, BorderLayout.CENTER);
 
         // Ações
         btnPesquisar.addActionListener(e -> buscarLivros());
         txtPesquisa.addActionListener(e -> buscarLivros());
+        btnBuscarId.addActionListener(e -> buscarLivroPorId());
+        txtBuscaId.addActionListener(e -> buscarLivroPorId());
+        btnLimpar.addActionListener(e -> {
+            txtPesquisa.setText("");
+            txtBuscaId.setText("");
+            carregarLivros(dao.listarLivros());
+        });
 
         add(painelPrincipal);
-
-        // Carregar a lista inicial
         carregarLivros(dao.listarLivros());
+    }
+
+    private void estilizarCampoTexto(JTextField campo, String tooltip) {
+        campo.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        campo.setToolTipText(tooltip);
+        campo.setBackground(new Color(248, 250, 252));
+        campo.setForeground(COR_HEADER);
+        campo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
+            new EmptyBorder(6, 10, 6, 10)
+        ));
+    }
+
+    private JButton criarBotaoEstilizado(String texto, Color corNormal, Color corHover) {
+        JButton btn = new JButton(texto);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn.setBackground(corNormal);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(new EmptyBorder(8, 14, 8, 14));
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(corHover);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(corNormal);
+            }
+        });
+        return btn;
     }
 
     private void carregarLivros(List<Livro> livros) {
         painelListaCards.removeAll();
 
-        if (livros.isEmpty()) {
-            JLabel lblVazio = new JLabel("Nenhum livro encontrado.", SwingConstants.CENTER);
-            lblVazio.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        if (livros == null || livros.isEmpty()) {
+            JPanel painelVazio = new JPanel(new GridBagLayout());
+            painelVazio.setBackground(COR_FUNDO);
+            JLabel lblVazio = new JLabel("Nenhum livro encontrado no catálogo.");
+            lblVazio.setFont(new Font("SansSerif", Font.BOLD, 15));
             lblVazio.setForeground(new Color(100, 116, 139));
-            painelListaCards.add(lblVazio);
+            painelVazio.add(lblVazio);
+            painelListaCards.add(painelVazio);
         } else {
             for (Livro livro : livros) {
                 painelListaCards.add(criarCardLivro(livro));
-                painelListaCards.add(Box.createVerticalStrut(12));
+                painelListaCards.add(Box.createVerticalStrut(14));
             }
         }
 
@@ -117,25 +197,38 @@ public class TelaLivros extends JFrame {
     }
 
     private JPanel criarCardLivro(Livro livro) {
-        JPanel card = new JPanel(new BorderLayout(15, 0));
-        card.setBackground(Color.WHITE);
+        // Card com borda esquerda de destaque e efeito hover
+        JPanel card = new JPanel(new BorderLayout(18, 0));
+        card.setBackground(COR_CARD);
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(226, 232, 240), 1, true),
-            new EmptyBorder(12, 15, 12, 15)
+            BorderFactory.createMatteBorder(1, 5, 1, 1, COR_PRIMARIA),
+            new EmptyBorder(15, 16, 15, 18)
         ));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 160));
+        card.setPreferredSize(new Dimension(680, 165));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 165));
 
-        // --- CAPA À ESQUERDA ---
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.setBackground(COR_CARD_HOVER);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.setBackground(COR_CARD);
+            }
+        });
+
+        // --- CAPA À ESQUERDA COM MOLDURA ---
         JLabel lblCapa = new JLabel();
-        lblCapa.setPreferredSize(new Dimension(85, 125));
+        lblCapa.setPreferredSize(new Dimension(88, 128));
         lblCapa.setHorizontalAlignment(SwingConstants.CENTER);
+        lblCapa.setBorder(BorderFactory.createLineBorder(COR_BORDA, 1));
 
         ImageIcon iconeCapa = carregarImagem(livro.getCapa());
         if (iconeCapa != null) {
             lblCapa.setIcon(iconeCapa);
         } else {
-            // Desenha a capa estilizada com fundo colorido igual ao print do professor
-            lblCapa.setIcon(new ImageIcon(gerarCapaIlustrativa(livro.getTitulo(), livro.getAutor(), 85, 125)));
+            lblCapa.setIcon(new ImageIcon(gerarCapaIlustrativa(livro.getTitulo(), livro.getAutor(), 88, 128)));
         }
         card.add(lblCapa, BorderLayout.WEST);
 
@@ -145,35 +238,38 @@ public class TelaLivros extends JFrame {
         painelInfo.setOpaque(false);
 
         JLabel lblTitulo = new JLabel(livro.getTitulo());
-        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 17));
-        lblTitulo.setForeground(new Color(30, 41, 59));
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblTitulo.setForeground(COR_HEADER);
+        lblTitulo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblAutor = new JLabel(livro.getAutor());
+        JLabel lblAutor = new JLabel("por " + livro.getAutor());
         lblAutor.setFont(new Font("SansSerif", Font.PLAIN, 14));
         lblAutor.setForeground(new Color(100, 116, 139));
+        lblAutor.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Badge de Ano
-        JLabel lblAno = new JLabel("  " + livro.getAno() + "  ");
-        lblAno.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        lblAno.setForeground(new Color(71, 85, 105));
-        lblAno.setBackground(new Color(241, 245, 249));
-        lblAno.setOpaque(true);
-        lblAno.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240), 1));
+        // Badges Estilizados (Ano + ID)
+        JPanel painelBadges = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        painelBadges.setOpaque(false);
+        painelBadges.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Botão "Ver detalhes" (também permite alterar capa ao clicar)
-        JButton btnDetalhes = new JButton("Ver detalhes");
-        btnDetalhes.setFont(new Font("SansSerif", Font.BOLD, 12));
-        btnDetalhes.setBackground(new Color(59, 89, 152));
-        btnDetalhes.setForeground(Color.WHITE);
-        btnDetalhes.setFocusPainted(false);
+        JLabel lblAno = criarBadge("📅 " + livro.getAno(), new Color(239, 246, 255), new Color(29, 78, 216));
+        JLabel lblBadgeId = criarBadge("ID #" + livro.getId(), new Color(241, 245, 249), new Color(71, 85, 105));
+
+        painelBadges.add(lblAno);
+        painelBadges.add(Box.createHorizontalStrut(8));
+        painelBadges.add(lblBadgeId);
+
+        // Botão de ação
+        JButton btnDetalhes = criarBotaoEstilizado("Alterar / Ver Capa", COR_PRIMARIA, COR_PRIMARIA_HOVER);
+        btnDetalhes.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnDetalhes.addActionListener(e -> selecionarCapaParaLivro(livro));
 
         painelInfo.add(lblTitulo);
-        painelInfo.add(Box.createVerticalStrut(4));
+        painelInfo.add(Box.createVerticalStrut(3));
         painelInfo.add(lblAutor);
-        painelInfo.add(Box.createVerticalStrut(8));
-        painelInfo.add(lblAno);
         painelInfo.add(Box.createVerticalStrut(10));
+        painelInfo.add(painelBadges);
+        painelInfo.add(Box.createVerticalStrut(12));
         painelInfo.add(btnDetalhes);
 
         card.add(painelInfo, BorderLayout.CENTER);
@@ -181,16 +277,27 @@ public class TelaLivros extends JFrame {
         return card;
     }
 
-    // Gera a capa no estilo artesanal do exemplo (Verde para Machado de Assis / Marrom para outros)
+    private JLabel criarBadge(String texto, Color fundo, Color textoCor) {
+        JLabel badge = new JLabel("  " + texto + "  ");
+        badge.setFont(new Font("SansSerif", Font.BOLD, 11));
+        badge.setForeground(textoCor);
+        badge.setBackground(fundo);
+        badge.setOpaque(true);
+        badge.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
+            new EmptyBorder(3, 6, 3, 6)
+        ));
+        return badge;
+    }
+
     private Image gerarCapaIlustrativa(String titulo, String autor, int largura, int altura) {
         BufferedImage img = new BufferedImage(largura, altura, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = img.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Seleção de cor do fundo
-        Color corFundo = new Color(55, 90, 70); // Verde escuro elegante por padrão
+        Color corFundo = new Color(30, 58, 95);
         if (titulo.toLowerCase().contains("cortiço") || titulo.toLowerCase().contains("cortico")) {
-            corFundo = new Color(145, 80, 50); // Marrom terracota
+            corFundo = new Color(145, 80, 50);
         } else if (autor.toLowerCase().contains("machado")) {
             corFundo = new Color(40, 75, 60);
         }
@@ -198,11 +305,9 @@ public class TelaLivros extends JFrame {
         g2.setColor(corFundo);
         g2.fillRect(0, 0, largura, altura);
 
-        // Borda dourada sutil interna
         g2.setColor(new Color(225, 205, 140, 180));
-        g2.drawRect(4, 4, largura - 9, altura - 9);
+        g2.drawRect(5, 5, largura - 11, altura - 11);
 
-        // Texto do Título centralizado
         g2.setColor(new Color(245, 235, 200));
         g2.setFont(new Font("Serif", Font.BOLD, 11));
 
@@ -216,7 +321,6 @@ public class TelaLivros extends JFrame {
             y += 14;
         }
 
-        // Desenha o detalhe geométrico (losango/estrela) no centro
         int centroX = largura / 2;
         int centroY = altura / 2 + 10;
         Polygon losango = new Polygon();
@@ -226,7 +330,6 @@ public class TelaLivros extends JFrame {
         losango.addPoint(centroX - 7, centroY);
         g2.fill(losango);
 
-        // Nome do autor no rodapé
         g2.setFont(new Font("SansSerif", Font.PLAIN, 8));
         FontMetrics fmAutor = g2.getFontMetrics();
         String autorReduzido = autor.toUpperCase();
@@ -246,7 +349,7 @@ public class TelaLivros extends JFrame {
         try {
             BufferedImage img = ImageIO.read(arquivo);
             if (img == null) return null;
-            Image reduzida = img.getScaledInstance(85, 125, Image.SCALE_SMOOTH);
+            Image reduzida = img.getScaledInstance(88, 128, Image.SCALE_SMOOTH);
             return new ImageIcon(reduzida);
         } catch (IOException e) {
             return null;
@@ -254,11 +357,40 @@ public class TelaLivros extends JFrame {
     }
 
     private void buscarLivros() {
+        txtBuscaId.setText("");
         String termo = txtPesquisa.getText().trim();
         if (termo.isEmpty()) {
             carregarLivros(dao.listarLivros());
         } else {
             carregarLivros(dao.buscarLivrosPorTitulo(termo));
+        }
+    }
+
+    private void buscarLivroPorId() {
+        txtPesquisa.setText("");
+        String textoId = txtBuscaId.getText().trim();
+        if (textoId.isEmpty()) {
+            carregarLivros(dao.listarLivros());
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(textoId);
+            Livro encontrado = null;
+            for (Livro l : dao.listarLivros()) {
+                if (l.getId() == id) {
+                    encontrado = l;
+                    break;
+                }
+            }
+
+            if (encontrado != null) {
+                carregarLivros(Collections.singletonList(encontrado));
+            } else {
+                carregarLivros(Collections.emptyList());
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Digite um número de ID válido.");
         }
     }
 
@@ -276,7 +408,7 @@ public class TelaLivros extends JFrame {
 
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Capa atualizada com sucesso!");
-                buscarLivros();
+                carregarLivros(dao.listarLivros());
             } else {
                 java.nio.file.Files.deleteIfExists(destino);
                 JOptionPane.showMessageDialog(this, "Erro ao atualizar banco.");
