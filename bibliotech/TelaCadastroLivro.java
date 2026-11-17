@@ -3,7 +3,7 @@
  * Projeto   : bibliotech
  * Arquivo   : TelaCadastroLivro.java
  * Autor     : João Pedro Mauda
- * Descricao : Interface de Cadastro de Livros com layout equilibrado, prévia da capa e paleta unificada.
+ * Descricao : Interface de Cadastro de Livros com validação personalizada e tratamento de exceções (Aula 46).
  */
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class TelaCadastroLivro extends JFrame {
@@ -270,31 +271,57 @@ public class TelaCadastroLivro extends JFrame {
         String autor = txtAutor.getText().trim();
         String anoStr = txtAno.getText().trim();
 
-        if (titulo.isEmpty() || autor.isEmpty() || anoStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         try {
             int ano = Integer.parseInt(anoStr);
+
+            // Validação personalizada (lança LivroInvalidoException se algo estiver incorreto)
+            ValidadorLivro.validar(titulo, autor, ano);
 
             boolean inserido = dao.adicionarLivro(titulo, autor, ano);
             if (inserido) {
                 if (arquivoImagemSelecionado != null) {
-                    List<Livro> livros = dao.buscarLivrosPorTitulo(titulo);
-                    if (!livros.isEmpty()) {
-                        Livro cadastrado = livros.get(livros.size() - 1);
-                        String caminhoCapa = ImagemLivro.salvar(arquivoImagemSelecionado.toPath(), cadastrado.getId());
-                        dao.atualizarCapa(cadastrado.getId(), caminhoCapa);
+                    try {
+                        List<Livro> livros = dao.buscarLivrosPorTitulo(titulo);
+                        if (!livros.isEmpty()) {
+                            Livro cadastrado = livros.get(livros.size() - 1);
+                            String caminhoCapa = ImagemLivro.salvar(arquivoImagemSelecionado.toPath(), cadastrado.getId());
+                            dao.atualizarCapa(cadastrado.getId(), caminhoCapa.replace('\\', '/'));
+                        }
+                    } catch (IOException ioEx) {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Livro cadastrado, mas não foi possível salvar a imagem da capa.",
+                            "Aviso de imagem",
+                            JOptionPane.WARNING_MESSAGE
+                        );
+                        ioEx.printStackTrace();
                     }
                 }
                 JOptionPane.showMessageDialog(this, "Livro cadastrado com sucesso!");
                 dispose();
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Ano inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar imagem: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                this,
+                "O ano deve ser um número inteiro válido.",
+                "Entrada inválida",
+                JOptionPane.WARNING_MESSAGE
+            );
+        } catch (LivroInvalidoException ex) {
+            JOptionPane.showMessageDialog(
+                this,
+                ex.getMessage(),
+                "Dados inválidos",
+                JOptionPane.WARNING_MESSAGE
+            );
+        } catch (PersistenciaException ex) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Não foi possível salvar o livro. Verifique a conexão com o MariaDB.",
+                "Erro de conexão",
+                JOptionPane.ERROR_MESSAGE
+            );
+            ex.printStackTrace();
         }
     }
 

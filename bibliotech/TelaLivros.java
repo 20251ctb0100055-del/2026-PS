@@ -3,7 +3,7 @@
  * Projeto   : bibliotech
  * Arquivo   : TelaLivros.java
  * Autor     : João Pedro Mauda
- * Descricao : Interface moderna do Catálogo BiblioTech com design aprimorado, hover nos cards e busca por Título/ID.
+ * Descricao : Interface moderna do Catálogo BiblioTech com tratamento de exceções (Aula 46).
  */
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -133,11 +133,11 @@ public class TelaLivros extends JFrame {
         btnLimpar.addActionListener(e -> {
             txtPesquisa.setText("");
             txtBuscaId.setText("");
-            carregarLivros(dao.listarLivros());
+            carregarTodosOsLivros();
         });
 
         add(painelPrincipal);
-        carregarLivros(dao.listarLivros());
+        carregarTodosOsLivros();
     }
 
     private void estilizarCampoTexto(JTextField campo, String tooltip) {
@@ -174,7 +174,39 @@ public class TelaLivros extends JFrame {
         return btn;
     }
 
-    private void carregarLivros(List<Livro> livros) {
+    private void carregarTodosOsLivros() {
+        try {
+            List<Livro> livros = dao.listarLivros();
+            exibirLivros(livros);
+        } catch (PersistenciaException e) {
+            tratarErroConexao(e);
+        }
+    }
+
+    private void tratarErroConexao(PersistenciaException e) {
+        System.err.println(e.getMessage());
+        e.printStackTrace();
+
+        painelListaCards.removeAll();
+        JPanel painelErro = new JPanel(new GridBagLayout());
+        painelErro.setBackground(COR_FUNDO);
+        JLabel lblErro = new JLabel("⚠️ Erro de conexão com o banco de dados MariaDB.");
+        lblErro.setFont(new Font("SansSerif", Font.BOLD, 15));
+        lblErro.setForeground(new Color(185, 28, 28));
+        painelErro.add(lblErro);
+        painelListaCards.add(painelErro);
+        painelListaCards.revalidate();
+        painelListaCards.repaint();
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Não foi possível carregar os livros. Verifique a conexão com o MariaDB.",
+            "Erro de conexão",
+            JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+    private void exibirLivros(List<Livro> livros) {
         painelListaCards.removeAll();
 
         if (livros == null || livros.isEmpty()) {
@@ -359,10 +391,14 @@ public class TelaLivros extends JFrame {
     private void buscarLivros() {
         txtBuscaId.setText("");
         String termo = txtPesquisa.getText().trim();
-        if (termo.isEmpty()) {
-            carregarLivros(dao.listarLivros());
-        } else {
-            carregarLivros(dao.buscarLivrosPorTitulo(termo));
+        try {
+            if (termo.isEmpty()) {
+                exibirLivros(dao.listarLivros());
+            } else {
+                exibirLivros(dao.buscarLivrosPorTitulo(termo));
+            }
+        } catch (PersistenciaException e) {
+            tratarErroConexao(e);
         }
     }
 
@@ -370,27 +406,43 @@ public class TelaLivros extends JFrame {
         txtPesquisa.setText("");
         String textoId = txtBuscaId.getText().trim();
         if (textoId.isEmpty()) {
-            carregarLivros(dao.listarLivros());
+            carregarTodosOsLivros();
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(textoId);
+            if (id <= 0) {
+                throw new IllegalArgumentException("O ID deve ser positivo.");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Informe um número inteiro válido.",
+                "Entrada inválida",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(
+                this,
+                e.getMessage(),
+                "Entrada inválida",
+                JOptionPane.WARNING_MESSAGE
+            );
             return;
         }
 
         try {
-            int id = Integer.parseInt(textoId);
-            Livro encontrado = null;
-            for (Livro l : dao.listarLivros()) {
-                if (l.getId() == id) {
-                    encontrado = l;
-                    break;
-                }
-            }
-
+            Livro encontrado = dao.buscarLivroPorId(id);
             if (encontrado != null) {
-                carregarLivros(Collections.singletonList(encontrado));
+                exibirLivros(Collections.singletonList(encontrado));
             } else {
-                carregarLivros(Collections.emptyList());
+                exibirLivros(Collections.emptyList());
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Digite um número de ID válido.");
+        } catch (PersistenciaException e) {
+            tratarErroConexao(e);
         }
     }
 
@@ -408,13 +460,38 @@ public class TelaLivros extends JFrame {
 
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Capa atualizada com sucesso!");
-                carregarLivros(dao.listarLivros());
+                carregarTodosOsLivros();
             } else {
                 java.nio.file.Files.deleteIfExists(destino);
-                JOptionPane.showMessageDialog(this, "Erro ao atualizar banco.");
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Não foi possível localizar o livro para atualizar a capa.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+                );
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Não foi possível salvar a imagem selecionada. Verifique o arquivo.",
+                "Erro de imagem",
+                JOptionPane.ERROR_MESSAGE
+            );
+            ex.printStackTrace();
+        } catch (PersistenciaException ex) {
+            if (destino != null) {
+                try {
+                    java.nio.file.Files.deleteIfExists(destino);
+                } catch (IOException ignored) {
+                }
+            }
+            JOptionPane.showMessageDialog(
+                this,
+                "Não foi possível atualizar a capa no banco de dados. Verifique a conexão.",
+                "Erro de conexão",
+                JOptionPane.ERROR_MESSAGE
+            );
+            ex.printStackTrace();
         }
     }
 
